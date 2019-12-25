@@ -1,19 +1,20 @@
 #include "widget.h"
 #include "ui_widget.h"
-
 #include <QBitmap>
 #include <QBrush>
 #include <QDebug>
 #include <QImage>
+#include <QMouseEvent>
 #include <QPainter>
 #include <QPalette>
 #include <QPixmap>
 #include <QRect>
 #include <QSignalMapper>
-Widget::Widget(QWidget *parent)
+Widget::Widget(QWidget* parent)
     : QWidget(parent)
     , ui(new Ui::Widget)
     , m_currentDrawImageIndx(0)
+    , isFullScreen(false)
 {
     ui->setupUi(this);
     //    this->setPalette(QPalette(Qt::transparent));
@@ -35,10 +36,15 @@ Widget::Widget(QWidget *parent)
     //初始化图片名字列表
     initImageFileNameList();
     //初始化信号槽
-    //    connect(ui->btnLeft, &QPushButton::clicked, this, &Widget::switchButtonClicked);
-    //    connect(ui->btnRight, &QPushButton::clicked, this, &Widget::switchButtonClicked);
-    connect(ui->btnLeft, &QPushButton::clicked, [=]() { switchButtonClicked(-1); });
-    connect(ui->btnRight, &QPushButton::clicked, [=]() { switchButtonClicked(1); });
+    //    connect(ui->btnLeft, &QPushButton::clicked, this,
+    //    &Widget::switchButtonClicked);
+    //    connect(ui->btnRight, &QPushButton::clicked, this,
+    //    &Widget::switchButtonClicked);
+    connect(ui->btnLeft, &QPushButton::clicked,
+        [=]() { switchButtonClicked(-1); });
+    connect(ui->btnRight, &QPushButton::clicked,
+        [=]() { switchButtonClicked(1); });
+    qDebug() << "fsdfdsfdsf";
 }
 
 Widget::~Widget()
@@ -70,7 +76,6 @@ void Widget::switchButtonClicked(int i)
     }
     //    paintOnWidget(ui->frame);
     ui->frame->update();
-    //qDebug() << m_currentDrawImageIndx;
 }
 /*
 void Widget::paintEvent(QPaintEvent *event)
@@ -102,7 +107,8 @@ void Widget::paintEvent(QPaintEvent *event)
     qDebug() << W << H;
     qDebug() << availableW << availabelH;
     qDebug() << "*********************************";
-    painter.setViewport((W - availableW) / 2, (H - availabelH) / 2, availableW, availabelH);
+    painter.setViewport((W - availableW) / 2, (H - availabelH) / 2, availableW,
+availabelH);
     painter.setWindow(-(width / 2), -(height) / 2, width, height);
     //    painter.setWindow(0, 0, width, height);
 
@@ -130,7 +136,7 @@ void Widget::paintEvent(QPaintEvent *event)
     painter.drawImage(rect, QImage(":images/fruit_12.jpg"));
 }
 */
-bool Widget::eventFilter(QObject *watched, QEvent *e)
+bool Widget::eventFilter(QObject* watched, QEvent* e)
 {
     if (watched == ui->frame) {
         if (e->type() == QEvent::Paint) {
@@ -143,7 +149,7 @@ bool Widget::eventFilter(QObject *watched, QEvent *e)
     return QWidget::eventFilter(watched, e);
 }
 
-void Widget::paintOnWidget(QWidget *w)
+void Widget::paintOnWidget(QWidget* w)
 {
     qDebug() << "paintOnWidget";
     //创建QPainter对象
@@ -151,11 +157,11 @@ void Widget::paintOnWidget(QWidget *w)
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setRenderHint(QPainter::TextAntialiasing);
     /*
-    if (painter == nullptr) {
-        painter = new QPainter(w);
-        painter->setRenderHint(QPainter::Antialiasing);
-        painter->setRenderHint(QPainter::TextAntialiasing);
-    }
+  if (painter == nullptr) {
+      painter = new QPainter(w);
+      painter->setRenderHint(QPainter::Antialiasing);
+      painter->setRenderHint(QPainter::TextAntialiasing);
+  }
 */
     qDebug() << w->metaObject()->className();
     qDebug() << w->styleSheet();
@@ -179,17 +185,33 @@ void Widget::paintOnWidget(QWidget *w)
     qDebug() << W << H;
     qDebug() << availableW << availabelH;
     qDebug() << "*********************************";
-    painter.setViewport((W - availableW) / 2, (H - availabelH) / 2, availableW, availabelH);
+    painter.setViewport((W - availableW) / 2, (H - availabelH) / 2, availableW,
+        availabelH);
     painter.setWindow(-(width / 2), -(height) / 2, width, height);
     //    painter.setWindow(0, 0, width, height);
 
     QRect rect(-(width / 2), -(height) / 2, width, height);
-    qDebug() << m_imageFileNameList;
-    qDebug() << m_currentDrawImageIndx;
-    qDebug() << m_imageFileNameList.at(m_currentDrawImageIndx);
-    painter.drawImage(rect, QImage(m_imageFileNameList.at(m_currentDrawImageIndx)));
+
+    painter.drawImage(rect,
+        QImage(m_imageFileNameList.at(m_currentDrawImageIndx)));
     painter.end();
     //要或不要都能运行，内存占用增长也均一样，都保持在同一个数值后不变了
     //    delete painter;
     //    painter = nullptr;
+}
+// void Widget::mousePressEvent(QMouseEvent *event)
+//{
+//    qDebug() << "mousePressEvent";
+//}
+
+void Widget::mouseDoubleClickEvent(QMouseEvent* event)
+{
+    isFullScreen = !isFullScreen;
+    if (isFullScreen) {
+        this->showFullScreen();
+    } else {
+        this->showNormal();
+    }
+
+    QWidget::mouseDoubleClickEvent(event);
 }

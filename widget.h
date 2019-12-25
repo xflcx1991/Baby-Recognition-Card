@@ -2,6 +2,8 @@
 #define WIDGET_H
 
 #include <QWidget>
+//#include <QMouseEvent>
+class QMouseEvent;
 //class QPainter;
 QT_BEGIN_NAMESPACE namespace Ui
 {
@@ -9,21 +11,22 @@ QT_BEGIN_NAMESPACE namespace Ui
 }
 QT_END_NAMESPACE
 
-class Widget : public QWidget
-{
+class Widget : public QWidget {
     Q_OBJECT
 
 public:
-    Widget(QWidget *parent = nullptr);
+    Widget(QWidget* parent = nullptr);
     ~Widget() override;
 
 protected:
     //    void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
-    virtual bool eventFilter(QObject *watched, QEvent *e) Q_DECL_OVERRIDE;
-    void paintOnWidget(QWidget *w);
+    virtual bool eventFilter(QObject* watched, QEvent* e) Q_DECL_OVERRIDE;
+    void paintOnWidget(QWidget* w);
+    //    void mousePressEvent(QMouseEvent* event) override;
+    void mouseDoubleClickEvent(QMouseEvent* event) override;
 
 private:
-    Ui::Widget *ui;
+    Ui::Widget* ui;
     //图片列表
     QList<QString> m_imageFileNameList;
     //当前显示图片index
@@ -36,6 +39,8 @@ private:
     //    QPainter *painter;
     void initImageFileNameList();
     void paintByPainter(QPainter painter);
+    bool isFullScreen;
+
 private slots:
     void switchButtonClicked(int);
 };
